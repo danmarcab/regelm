@@ -82,7 +82,7 @@ nonDigit =
 
 wordChar : Matcher
 wordChar =
-    OneOf [ Range 'A' 'Z', Range 'a' 'z', Only '_' ]
+    OneOf [ Range 'A' 'Z', Range 'a' 'z', Range '0' '9', Only '_' ]
 
 
 nonWordChar : Matcher

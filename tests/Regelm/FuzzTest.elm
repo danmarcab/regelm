@@ -31,8 +31,6 @@ patternTest =
                     in
                         fuzz (Fuzz.pattern compiled) ("pattern " ++ regex) <|
                             \str ->
-                                --                                Debug.log
-                                --                                    ("regex: \\" ++ regex ++ "\\, str")
                                 str
                                     |> Regelm.contains compiled
                                     |> Expect.equal True

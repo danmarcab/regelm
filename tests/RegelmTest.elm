@@ -5,6 +5,8 @@ import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Test exposing (..)
 import Regelm
+import Regelm.Fuzz exposing (pattern)
+import Regex
 
 
 containsTest : Test
@@ -54,6 +56,39 @@ containsTest =
         )
 
 
+mirrorTest : Test
+mirrorTest =
+    describe "contains should mirror Core Regex contains"
+        ([ "aabbb"
+         , "aa?bbb"
+         , "aa(bbb)?"
+         , "aa(bbb)+"
+         , "\\d* \\w+"
+         , "^aa(bbb)*$"
+         , "^((?:\\d?\\d )?(((Jan)|(Feb)|(Mar)|(Apr)|(May)|(Jun)|(Jul)|(Aug)|(Sep)|(Oct)|(Nov)|(Dec)) ))?\\d?\\d?\\d?\\d$"
+         , "[abcg-i]"
+         , "[^abcg-i]"
+         , "[g-iu-y]"
+         , "^\\d{3}$"
+         , "^\\d{2,4}$"
+         , "^\\d{3,}$"
+         , "^a\\s\\*$"
+         ]
+            |> List.map
+                (\regex ->
+                    let
+                        compiled =
+                            unsafeRegex regex
+                    in
+                        fuzz (fuzzer compiled) ("contains mirrors for" ++ regex) <|
+                            \str ->
+                                Regelm.contains (unsafeRegex regex) str
+                                    |> Expect.equal (Regex.contains (Regex.regex regex) str)
+                )
+        )
+
+
+unsafeRegex : String -> Regelm.Regex
 unsafeRegex regex =
     case Regelm.regex regex of
         Err err ->
@@ -61,3 +96,11 @@ unsafeRegex regex =
 
         Ok reg ->
             reg
+
+
+fuzzer : Regelm.Regex -> Fuzzer String
+fuzzer regex =
+    Fuzz.frequency
+        [ ( 1, pattern regex )
+        , ( 1, Fuzz.string )
+        ]
