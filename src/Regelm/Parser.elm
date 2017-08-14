@@ -175,8 +175,11 @@ specialCharParser =
 
 matcherParser : Parser Matcher.Matcher
 matcherParser =
-    Parser.succeed (\matchers -> Matcher.oneOf matchers)
-        |. Parser.keyword "["
+    Parser.succeed (\cons matchers -> cons <| Matcher.oneOf matchers)
+        |= Parser.oneOf
+            [ Parser.succeed Matcher.inverse |. Parser.keyword "[^"
+            , Parser.succeed identity |. Parser.keyword "["
+            ]
         |= Parser.repeat Parser.oneOrMore simpleMatcherParser
         |. Parser.keyword "]"
 

@@ -3,6 +3,7 @@ module Regelm.Matcher
         ( Matcher
         , matches
         , oneOf
+        , inverse
         , range
         , char
         , digit
@@ -52,6 +53,11 @@ matches theChar matcher =
 oneOf : List Matcher -> Matcher
 oneOf =
     OneOf
+
+
+inverse : Matcher -> Matcher
+inverse =
+    Not
 
 
 range : Char -> Char -> Matcher
