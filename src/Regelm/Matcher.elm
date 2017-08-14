@@ -1,4 +1,18 @@
-module Regelm.Matcher exposing (Matcher, matches, oneOf, range, char, digit, nonDigit, wordChar, nonWordChar, fuzzer)
+module Regelm.Matcher
+    exposing
+        ( Matcher
+        , matches
+        , oneOf
+        , range
+        , char
+        , digit
+        , nonDigit
+        , wordChar
+        , nonWordChar
+        , whiteSpace
+        , nonWhiteSpace
+        , fuzzer
+        )
 
 import Char
 import Fuzz exposing (Fuzzer)
@@ -68,6 +82,16 @@ wordChar =
 nonWordChar : Matcher
 nonWordChar =
     Not wordChar
+
+
+whiteSpace : Matcher
+whiteSpace =
+    Enum [ ' ', '\n', '\t', '\x0C', '\x0D', '\x0B' ]
+
+
+nonWhiteSpace : Matcher
+nonWhiteSpace =
+    Not whiteSpace
 
 
 fuzzer : Matcher -> Fuzzer Char

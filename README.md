@@ -47,17 +47,17 @@ Ok True
 - [x] `\D` Matches a non digit
 - [x] `\w` Matches a word char
 - [x] `\W` Matches a non word char
+- [x] `\` Escapes special chars
+- [x] `\f` Matches a form feed
+- [x] `\n` Matches a newline
+- [x] `\r` Matches a carriage return
+- [x] `\s` Matches a white space char
+- [x] `\S` Matches a non white space char
+- [x] `\t` Matches a tab char
+- [x] `\v` Matches a vertical tab
 
 ### High priority non supported syntax
 
-- [ ] `\` Escapes special chars
-- [ ] `\f` Matches a form feed
-- [ ] `\n` Matches a newline
-- [ ] `\r` Matches a carriage return
-- [ ] `\s` Matches a white space char
-- [ ] `\S` Matches a non white space char
-- [ ] `\t` Matches a tab char
-- [ ] `\v` Matches a vertical tab
 - [ ] `(?:x)` Matches and not capture
 - [ ] `[^xyz]` Matches any char but x, y or z
 - [ ] `[^x-z]` Matches any char but between x and z

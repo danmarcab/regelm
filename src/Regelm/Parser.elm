@@ -17,6 +17,8 @@ type Node
     | NonDigit
     | WordChar
     | NonWordChar
+    | WhiteSpace
+    | NonWhiteSpace
     | Matcher Matcher.Matcher
     | Start
     | End
@@ -144,11 +146,26 @@ charParser =
         [ Parser.succeed Matcher |= matcherParser
         , Parser.succeed Start |. Parser.keyword "^"
         , Parser.succeed End |. Parser.keyword "$"
-        , Parser.succeed Digit |. Parser.keyword "\\d"
-        , Parser.succeed NonDigit |. Parser.keyword "\\D"
-        , Parser.succeed WordChar |. Parser.keyword "\\w"
-        , Parser.succeed NonWordChar |. Parser.keyword "\\W"
+        , Parser.succeed identity |. Parser.keyword "\\" |= specialCharParser
         , Parser.map Char (oneCharParser notSpecial)
+        ]
+
+
+specialCharParser : Parser Node
+specialCharParser =
+    Parser.oneOf
+        [ Parser.succeed Digit |. Parser.keyword "d"
+        , Parser.succeed NonDigit |. Parser.keyword "D"
+        , Parser.succeed WordChar |. Parser.keyword "w"
+        , Parser.succeed NonWordChar |. Parser.keyword "W"
+        , Parser.succeed WhiteSpace |. Parser.keyword "s"
+        , Parser.succeed NonWhiteSpace |. Parser.keyword "S"
+        , Parser.succeed Char |. Parser.keyword "n" |= Parser.succeed '\n'
+        , Parser.succeed Char |. Parser.keyword "t" |= Parser.succeed '\t'
+        , Parser.succeed Char |. Parser.keyword "f" |= Parser.succeed '\x0C'
+        , Parser.succeed Char |. Parser.keyword "r" |= Parser.succeed '\x0D'
+        , Parser.succeed Char |. Parser.keyword "v" |= Parser.succeed '\x0B'
+        , Parser.succeed Char |= oneCharParser (always True)
         ]
 
 
@@ -226,6 +243,12 @@ nodeToProgram node =
 
         NonWordChar ->
             Program.singleton (Program.Match Matcher.nonWordChar)
+
+        WhiteSpace ->
+            Program.singleton (Program.Match Matcher.whiteSpace)
+
+        NonWhiteSpace ->
+            Program.singleton (Program.Match Matcher.nonWhiteSpace)
 
         Matcher matcher ->
             Program.singleton (Program.Match matcher)
