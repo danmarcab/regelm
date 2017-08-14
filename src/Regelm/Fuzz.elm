@@ -1,5 +1,8 @@
 module Regelm.Fuzz exposing (pattern)
 
+{-| Generate strings that follow a pattern and use them in your Fuzz tests.
+-}
+
 import Array
 import Char
 import Fuzz exposing (Fuzzer)
@@ -8,6 +11,9 @@ import Regelm.Program as Program exposing (Regex(..), Inst(..))
 import Regelm.Matcher as Matcher
 
 
+{-| Get a `Fuzzer String` from a `Regex`. This is useful when you want to create random
+strings that match a pattern.
+-}
 pattern : Regex -> Fuzzer String
 pattern (Regex program) =
     Fuzz.int
