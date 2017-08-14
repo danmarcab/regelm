@@ -31,6 +31,7 @@ type Node
     | RepeatAtMost Int Node
     | Alt Node Node
     | Group AST
+    | MatchGroup AST
 
 
 parse : String -> Result String Program.Program
@@ -134,8 +135,11 @@ simpleNodeParser =
 
 groupParser : Parser Node
 groupParser =
-    Parser.succeed Group
-        |. Parser.keyword "("
+    Parser.succeed (\const ast -> const ast)
+        |= Parser.oneOf
+            [ Parser.succeed Group |. Parser.keyword "(?:"
+            , Parser.succeed MatchGroup |. Parser.keyword "("
+            ]
         |= Parser.lazy (\_ -> astParser)
         |. Parser.keyword ")"
 
@@ -347,4 +351,7 @@ nodeToProgram node =
                 Program.append firstPart prog2
 
         Group ast ->
+            astToProgram ast
+
+        MatchGroup ast ->
             astToProgram ast

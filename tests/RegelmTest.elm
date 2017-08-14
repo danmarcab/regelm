@@ -16,7 +16,7 @@ containsTest =
          , ( "aa(bbb)+", [ "aabbb", "aabbbbbb", "svsfaabbbbbg", "sdfaabbbbbbbbbbbbbbbdsf" ], [ "aa", "abb", "babbbcvx" ] )
          , ( "\\d* \\w+", [ " g", "5 h", "465656 cdsvsd", "fsfds6 gt hjk" ], [ "5f", " ", "5 " ] )
          , ( "^aa(bbb)*$", [ "aa", "aabbb", "aabbbbbbbbb" ], [ "faa", "aab", "aabbbb" ] )
-         , ( "^((\\d?\\d )?(((Jan)|(Feb)|(Mar)|(Apr)|(May)|(Jun)|(Jul)|(Aug)|(Sep)|(Oct)|(Nov)|(Dec)) ))?\\d?\\d?\\d?\\d$"
+         , ( "^((?:\\d?\\d )?(((Jan)|(Feb)|(Mar)|(Apr)|(May)|(Jun)|(Jul)|(Aug)|(Sep)|(Oct)|(Nov)|(Dec)) ))?\\d?\\d?\\d?\\d$"
            , [ "1 Mar 2013", "21 Sep 86", "Dec 99", "2013" ]
            , [ "222 Jun 99", "23 Mar", "Mar" ]
            )

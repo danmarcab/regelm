@@ -55,10 +55,10 @@ Ok True
 - [x] `\S` Matches a non white space char
 - [x] `\t` Matches a tab char
 - [x] `\v` Matches a vertical tab
+- [x] `(?:x)` Matches and don't capture
 
 ### High priority non supported syntax
 
-- [ ] `(?:x)` Matches and not capture
 - [ ] `[^xyz]` Matches any char but x, y or z
 - [ ] `[^x-z]` Matches any char but between x and z
 - [ ] `(x)` Matches and capture

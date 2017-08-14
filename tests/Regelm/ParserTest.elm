@@ -97,7 +97,7 @@ testProg2 =
 -}
 testAst3 : Parser.AST
 testAst3 =
-    [ Char 'a', Char 'a', Opt (Group [ Char 'b', Char 'b', Char 'b' ]) ]
+    [ Char 'a', Char 'a', Opt (MatchGroup [ Char 'b', Char 'b', Char 'b' ]) ]
 
 
 testProg3 : Pr.Program
@@ -117,7 +117,7 @@ testProg3 =
 -}
 testAst4 : Parser.AST
 testAst4 =
-    [ Char 'a', Char 'a', Plus (Group [ Char 'b', Char 'b', Char 'b' ]) ]
+    [ Char 'a', Char 'a', Plus (MatchGroup [ Char 'b', Char 'b', Char 'b' ]) ]
 
 
 testProg4 : Pr.Program
@@ -137,7 +137,7 @@ testProg4 =
 -}
 testAst5 : Parser.AST
 testAst5 =
-    [ Char 'a', Char 'a', Opt (Group [ Char 'b', Char 'b', Char 'b' ]), Char ' ', Star Digit, Char ' ', Plus WordChar ]
+    [ Char 'a', Char 'a', Opt (MatchGroup [ Char 'b', Char 'b', Char 'b' ]), Char ' ', Star Digit, Char ' ', Plus WordChar ]
 
 
 testProg5 : Pr.Program
@@ -168,7 +168,7 @@ testProg5 =
 -}
 testAst6 : Parser.AST
 testAst6 =
-    [ Start, Char 'a', Char 'a', Plus (Group [ Char 'b', Char 'b', Char 'b' ]), End ]
+    [ Start, Char 'a', Char 'a', Plus (MatchGroup [ Char 'b', Char 'b', Char 'b' ]), End ]
 
 
 testProg6 : Pr.Program
