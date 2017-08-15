@@ -6,18 +6,15 @@ cache:
     - sysconfcpus
 
 os:
-  - osx
   - linux
 
 env:
+  global:
+    secure: "jFeqqUVpShVUJeASxUrSQi1FuZgx5Q26CARyESLQf2acizm/4yuuPFJCiws74yGbs2pfF6GwW6uPm8JQca1R69E8++1l8pufsPa9rhdeht3S+VzQVu2nLvk1uvpuWwdd0n2NS0weLX/Z71GylD4n9Yi6ERG7AV/QBCfOv5cZUz4uHAOexGifjXYoSgFQugSHk4w48K6KXeJBWkvK8xGvwsdGsGN0klWm2BOqhKjfiDOhMGdIu+6T0RAATb2vcHe1kzH26g+9deycPxtfiINFRWfzDKgwJKt2zgp4T+cmFG3V/JOemRVdau8EtvJ015ECAuI+gZ/XnsmcsYclRLQZ/jTyMHMx3HIVn6X7u+KEN+b5BwaJmUomsWOG6BWepAX1b47g4dOu8QWAuVBei3mheZUmdqwdo7XIHe6isDzFLHK+Y6U8wJD8vdsCS9q1/zseC3FkiCSKwKkX+CxG0jnM12l8eO/nA7rJ+bxo8V8P9Wdknq0My8tE+ZjfrEtwJBsrHYx3igTMLH6jyiDlYkh8cVqFKjfSKOpEuFlLYGSneJNRPA/zk34+a12Ug+fE7Ph/dhRzwHWNnI391Z12soRoZ0aawXT4MdJb627meb5JYmJp5SB/3YodL7FvQrtb4nQ9BJUcBH6whWndQyzahkwJhg1HTwKZBm0k665DfTy8Wi8="
   matrix:
     - ELM_VERSION=0.18.0 TARGET_NODE_VERSION=node
-    - ELM_VERSION=0.18.0 TARGET_NODE_VERSION=4.0
 
 before_install:
-  - if [ ${TRAVIS_OS_NAME} == "osx" ];
-    then brew update; brew install nvm; mkdir ~/.nvm; export NVM_DIR=~/.nvm; source $(brew --prefix nvm)/nvm.sh;
-    fi
   - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
   - | # epic build time improvement - see https://github.com/elm-lang/elm-compiler/issues/1473#issuecomment-245704142
     if [ ! -d sysconfcpus/bin ];
@@ -42,3 +39,12 @@ install:
 
 script:
   - elm-test
+  - cd gh_pages && elm-make --yes Main.elm --output build/index.html && cd ..
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  local_dir: gh_pages/build
+  on:
+    branch: master
