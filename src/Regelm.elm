@@ -9,7 +9,7 @@ The library can be use as a [`Program`](#using-program), so all your model will 
 
 # Parsing a regular expression
 
-@docs Action, regex
+@docs Regex, regex
 
 
 # Matching a string with a regular expression

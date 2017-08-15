@@ -1,6 +1,9 @@
 module Regelm.Fuzz exposing (pattern)
 
 {-| Generate strings that follow a pattern and use them in your Fuzz tests.
+
+@docs pattern
+
 -}
 
 import Array
