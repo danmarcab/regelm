@@ -1,10 +1,12 @@
 module Regelm exposing (Regex, contains, regex)
 
-{-| This library lets you have a retroactive model. This means you can undo / redo
-changes in your model. Retroactive means you can have different branches of future (redo).
+{-| Use regular expressions in Elm.
 
-The library can be use as a [`Program`](#using-program), so all your model will be retroactive, or
-[`not using Program`](#not-using-program), where you decide what parts of your model you want to make retroactive.
+At the moment only checking if a regular expression matches a pattern is supported
+([`contains`](#contains)). Capturing matched data is next on the roadmap.
+
+You can also see `Regelm.Random` and `Regelm.Fuzz` for random generators of strings
+that match a regular expression.
 
 
 # Parsing a regular expression

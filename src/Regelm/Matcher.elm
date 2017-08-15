@@ -12,11 +12,11 @@ module Regelm.Matcher
         , nonWordChar
         , whiteSpace
         , nonWhiteSpace
-        , fuzzer
+        , generator
         )
 
 import Char
-import Fuzz exposing (Fuzzer)
+import Random.Pcg as Random exposing (Seed, Generator)
 
 
 type Matcher
@@ -100,37 +100,34 @@ nonWhiteSpace =
     Not whiteSpace
 
 
-fuzzer : Matcher -> Fuzzer Char
-fuzzer matcher =
+generator : Matcher -> Generator Char
+generator matcher =
     case matcher of
         Only c ->
-            Fuzz.constant c
+            Random.constant c
 
         Range a b ->
-            Fuzz.map Char.fromCode <| Fuzz.intRange (Char.toCode a) (Char.toCode b)
+            Random.map Char.fromCode <| Random.int (Char.toCode a) (Char.toCode b)
 
         Enum chars ->
-            List.map Fuzz.constant chars
-                |> Fuzz.oneOf
+            List.map Random.constant chars
+                |> Random.choices
 
         OneOf matchers ->
-            List.map fuzzer matchers
-                |> Fuzz.oneOf
+            List.map generator matchers
+                |> Random.choices
 
         Not invMatcher ->
-            let
-                bruteForce char =
-                    if not <| matches char invMatcher then
-                        char
-                    else
-                        bruteForce <| Char.fromCode (Char.toCode char + 1)
-            in
-                Fuzz.conditional
-                    { retries = 100
-                    , fallback = bruteForce
-                    , condition = \char -> not <| matches char invMatcher
-                    }
-                    Fuzz.char
+            Random.filter (\char -> not <| matches char invMatcher) charGenerator
 
         Any ->
-            Fuzz.char
+            charGenerator
+
+
+charGenerator : Generator Char
+charGenerator =
+    Random.frequency
+        [ ( 8, Random.map Char.fromCode (Random.int 32 126) )
+        , ( 1, Random.map Char.fromCode (Random.int Random.minInt Random.maxInt) )
+        , ( 1, Random.map Char.fromCode (Random.int Random.minInt Random.maxInt) )
+        ]
