@@ -22,6 +22,7 @@ that match a regular expression.
 
 import Regelm.Program as Program
 import Regelm.Parser as Parser
+import Regelm.Compiler as Compiler
 
 
 {-| Holds a regular expression. It is a opaque type, to create `Regex` use [`regex`](#regex)
@@ -41,7 +42,9 @@ type alias Regex =
 -}
 regex : String -> Result String Regex
 regex str =
-    Parser.parse str |> Result.map Program.Regex
+    Parser.parse str
+        |> Result.map Compiler.compile
+        |> Result.map Program.Regex
 
 
 {-| Match a string with a regular expression

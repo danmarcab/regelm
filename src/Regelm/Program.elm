@@ -51,6 +51,11 @@ append prog other =
     Array.append prog (shift (length prog) other)
 
 
+appendNoShift : Program -> Program -> Program
+appendNoShift prog other =
+    Array.append prog other
+
+
 length : Program -> Int
 length prog =
     Array.length prog
