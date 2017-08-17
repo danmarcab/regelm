@@ -12,14 +12,7 @@ type alias AST =
 
 
 type Node
-    = Char Char
-    | Digit
-    | NonDigit
-    | WordChar
-    | NonWordChar
-    | WhiteSpace
-    | NonWhiteSpace
-    | Matcher Matcher.Matcher
+    = Matcher Matcher.Matcher
     | Start
     | End
     | Opt Node
@@ -47,7 +40,8 @@ parse srt =
 toAst : String -> Result String AST
 toAst str =
     Parser.run astParser str
-        |> Result.mapError (always "Invalid Regex")
+        |> Result.mapError toString
+        |> Debug.log "ast"
 
 
 astParser : Parser AST
@@ -150,26 +144,26 @@ charParser =
         [ Parser.succeed Matcher |= matcherParser
         , Parser.succeed Start |. Parser.keyword "^"
         , Parser.succeed End |. Parser.keyword "$"
-        , Parser.succeed identity |. Parser.keyword "\\" |= specialCharParser
-        , Parser.map Char (oneCharParser notSpecial)
+        , Parser.succeed Matcher |. Parser.keyword "\\" |= specialCharParser
+        , Parser.map (Matcher << Matcher.char) (oneCharParser notSpecial)
         ]
 
 
-specialCharParser : Parser Node
+specialCharParser : Parser Matcher.Matcher
 specialCharParser =
     Parser.oneOf
-        [ Parser.succeed Digit |. Parser.keyword "d"
-        , Parser.succeed NonDigit |. Parser.keyword "D"
-        , Parser.succeed WordChar |. Parser.keyword "w"
-        , Parser.succeed NonWordChar |. Parser.keyword "W"
-        , Parser.succeed WhiteSpace |. Parser.keyword "s"
-        , Parser.succeed NonWhiteSpace |. Parser.keyword "S"
-        , Parser.succeed Char |. Parser.keyword "n" |= Parser.succeed '\n'
-        , Parser.succeed Char |. Parser.keyword "t" |= Parser.succeed '\t'
-        , Parser.succeed Char |. Parser.keyword "f" |= Parser.succeed '\x0C'
-        , Parser.succeed Char |. Parser.keyword "r" |= Parser.succeed '\x0D'
-        , Parser.succeed Char |. Parser.keyword "v" |= Parser.succeed '\x0B'
-        , Parser.succeed Char |= oneCharParser (always True)
+        [ Parser.succeed Matcher.digit |. Parser.keyword "d"
+        , Parser.succeed Matcher.nonDigit |. Parser.keyword "D"
+        , Parser.succeed Matcher.wordChar |. Parser.keyword "w"
+        , Parser.succeed Matcher.nonWordChar |. Parser.keyword "W"
+        , Parser.succeed Matcher.whiteSpace |. Parser.keyword "s"
+        , Parser.succeed Matcher.nonWhiteSpace |. Parser.keyword "S"
+        , Parser.succeed Matcher.char |. Parser.keyword "n" |= Parser.succeed '\n'
+        , Parser.succeed Matcher.char |. Parser.keyword "t" |= Parser.succeed '\t'
+        , Parser.succeed Matcher.char |. Parser.keyword "f" |= Parser.succeed '\x0C'
+        , Parser.succeed Matcher.char |. Parser.keyword "r" |= Parser.succeed '\x0D'
+        , Parser.succeed Matcher.char |. Parser.keyword "v" |= Parser.succeed '\x0B'
+        , Parser.succeed Matcher.char |= oneCharParser (always True)
         ]
 
 
@@ -180,22 +174,35 @@ matcherParser =
             [ Parser.succeed Matcher.inverse |. Parser.keyword "[^"
             , Parser.succeed identity |. Parser.keyword "["
             ]
-        |= Parser.repeat Parser.oneOrMore simpleMatcherParser
+        |= Parser.repeat Parser.oneOrMore
+            (Parser.oneOf
+                [ Parser.succeed identity |. Parser.keyword "\\" |= specialCharParser
+                , simpleMatcherParser
+                ]
+            )
         |. Parser.keyword "]"
 
 
 simpleMatcherParser : Parser Matcher.Matcher
 simpleMatcherParser =
-    (oneCharParser notSpecial)
+    (oneCharParser (\char -> char /= ']'))
         |> Parser.andThen
             (\char ->
-                Parser.oneOf
-                    [ Parser.succeed (Matcher.range char)
-                        |. Parser.keyword "-"
-                        |= (oneCharParser notSpecial)
-                    , Parser.succeed <| Matcher.char char
-                    ]
+                if allowedInRange char then
+                    Parser.oneOf
+                        [ Parser.succeed (Matcher.range char)
+                            |. Parser.keyword "-"
+                            |= (oneCharParser allowedInRange)
+                        , Parser.succeed <| Matcher.char char
+                        ]
+                else
+                    Parser.succeed <| Matcher.char char
             )
+
+
+allowedInRange : Char -> Bool
+allowedInRange char =
+    Char.isDigit char || Char.isLower char || Char.isUpper char
 
 
 oneCharParser : (Char -> Bool) -> Parser Char
@@ -236,27 +243,6 @@ astToProgram ast =
 nodeToProgram : Node -> Program.Program
 nodeToProgram node =
     case node of
-        Char char ->
-            Program.singleton (Program.Match (Matcher.char char))
-
-        Digit ->
-            Program.singleton (Program.Match Matcher.digit)
-
-        NonDigit ->
-            Program.singleton (Program.Match Matcher.nonDigit)
-
-        WordChar ->
-            Program.singleton (Program.Match Matcher.wordChar)
-
-        NonWordChar ->
-            Program.singleton (Program.Match Matcher.nonWordChar)
-
-        WhiteSpace ->
-            Program.singleton (Program.Match Matcher.whiteSpace)
-
-        NonWhiteSpace ->
-            Program.singleton (Program.Match Matcher.nonWhiteSpace)
-
         Matcher matcher ->
             Program.singleton (Program.Match matcher)
 

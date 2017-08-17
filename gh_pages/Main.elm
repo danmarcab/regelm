@@ -45,7 +45,7 @@ update msg model =
                         |> Result.toMaybe
 
                 examples =
-                    Maybe.map (generateExamples model.seed) compiled
+                    Maybe.map (generateExamples 10 model.seed) compiled
                         |> Maybe.withDefault []
             in
                 ( { model
@@ -63,28 +63,35 @@ update msg model =
             ( { model | seed = seed }, Cmd.none )
 
 
-generateExamples : Seed -> Regex -> List String
-generateExamples seed regex =
-    List.foldl
-        (\_ ( seed, list ) ->
-            let
-                ( str, newSeed ) =
-                    Random.step (Regelm.Random.pattern regex) seed
-            in
-                ( newSeed, str :: list )
-        )
-        ( seed, [] )
-        (List.range 1 50)
-        |> Tuple.second
-        |> Set.fromList
-        |> Set.toList
-        |> List.take 10
+generateExamples : Int -> Seed -> Regex -> List String
+generateExamples n seed regex =
+    generateExamplesWithLimit 1000 n [] seed regex
+        |> List.sort
+
+
+generateExamplesWithLimit : Int -> Int -> List String -> Seed -> Regex -> List String
+generateExamplesWithLimit remainingAttempts n list seed regex =
+    if remainingAttempts == 0 || List.length list == n then
+        list
+    else
+        let
+            ( str, newSeed ) =
+                Random.step (Regelm.Random.pattern regex) seed
+
+            newList =
+                if List.member str list then
+                    list
+                else
+                    str :: list
+        in
+            generateExamplesWithLimit (remainingAttempts - 1) n newList newSeed regex
 
 
 view : Model -> Html Msg
 view model =
     div []
         [ input [ onInput UpdateInput, value model.inputRegex ] []
+        , text (Maybe.map (\_ -> "valid") model.compiledRegex |> Maybe.withDefault "invalid")
         , input [ onInput UpdateTest, value model.testString ] []
         , examplesView model.examples
         ]

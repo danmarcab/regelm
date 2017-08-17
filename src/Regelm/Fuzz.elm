@@ -17,4 +17,6 @@ strings that match a pattern in your tests.
 -}
 pattern : Regex -> Fuzzer String
 pattern regex =
-    Fuzz.custom (Regelm.Random.pattern regex) Shrink.noShrink
+    Fuzz.custom
+        (Regelm.Random.pattern regex)
+        (Shrink.keepIf (Regelm.contains regex) Shrink.string)

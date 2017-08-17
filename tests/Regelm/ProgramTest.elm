@@ -1,6 +1,6 @@
 module Regelm.ProgramTest exposing (..)
 
-import Array exposing (Array)
+import Array.Hamt as Array exposing (Array)
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Test exposing (..)

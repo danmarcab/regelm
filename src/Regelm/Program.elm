@@ -1,6 +1,6 @@
 module Regelm.Program exposing (..)
 
-import Array exposing (Array)
+import Array.Hamt as Array exposing (Array)
 import Set exposing (Set)
 import Regelm.Matcher as Matcher
 
