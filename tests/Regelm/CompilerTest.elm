@@ -72,7 +72,7 @@ testProg2 : Pr.Program
 testProg2 =
     Array.fromList
         [ Pr.Match (char 'a')
-        , Pr.Split 2 3
+        , Pr.Split [ 2, 3 ]
         , Pr.Match (char 'a')
         , Pr.Match (char 'b')
         , Pr.Match (char 'b')
@@ -102,7 +102,7 @@ testProg3 =
     Array.fromList
         [ Pr.Match (char 'a')
         , Pr.Match (char 'a')
-        , Pr.Split 3 6
+        , Pr.Split [ 3, 6 ]
         , Pr.Match (char 'b')
         , Pr.Match (char 'b')
         , Pr.Match (char 'b')
@@ -134,7 +134,7 @@ testProg4 =
         , Pr.Match (char 'b')
         , Pr.Match (char 'b')
         , Pr.Match (char 'b')
-        , Pr.Split 2 6
+        , Pr.Split [ 2, 6 ]
         , Pr.Matched
         ]
 
@@ -164,21 +164,21 @@ testProg5 =
     Array.fromList
         [ Pr.Match (char 'a')
         , Pr.Match (char 'a')
-        , Pr.Split 3 6
+        , Pr.Split [ 3, 6 ]
         , Pr.Match (char 'b')
         , Pr.Match (char 'b')
 
         -- 5
         , Pr.Match (char 'b')
         , Pr.Match (char ' ')
-        , Pr.Split 8 10
+        , Pr.Split [ 8, 10 ]
         , Pr.Match (Matcher.digit)
         , Pr.Jump 7
 
         -- 10
         , Pr.Match (char ' ')
         , Pr.Match (Matcher.wordChar)
-        , Pr.Split 11 13
+        , Pr.Split [ 11, 13 ]
         , Pr.Matched
         ]
 
@@ -199,7 +199,7 @@ testProg6 =
         , Pr.Match (char 'b')
         , Pr.Match (char 'b')
         , Pr.Match (char 'b')
-        , Pr.Split 3 7
+        , Pr.Split [ 3, 7 ]
         , Pr.End
         , Pr.Matched
         ]
@@ -220,15 +220,13 @@ testAst7 =
 testProg7 : Pr.Program
 testProg7 =
     Array.fromList
-        [ Pr.Split 1 3
+        [ Pr.Split [ 1, 3, 5 ]
         , Pr.Match (char 'a')
-        , Pr.Jump 9
-        , Pr.Split 4 6
+        , Pr.Jump 7
         , Pr.Match (char 'b')
-        , Pr.Jump 9
-        , Pr.Split 7 9
+        , Pr.Jump 7
         , Pr.Match (char 'c')
-        , Pr.Jump 9
+        , Pr.Jump 7
         , Pr.Matched
         ]
 
@@ -248,20 +246,18 @@ testAst8 =
 testProg8 : Pr.Program
 testProg8 =
     Array.fromList
-        [ Pr.Split 1 5
+        [ Pr.Split [ 1, 5, 9 ]
         , Pr.Match (char 'J')
         , Pr.Match (char 'a')
         , Pr.Match (char 'n')
-        , Pr.Jump 15
-        , Pr.Split 6 10
+        , Pr.Jump 13
         , Pr.Match (char 'F')
         , Pr.Match (char 'e')
         , Pr.Match (char 'b')
-        , Pr.Jump 15
-        , Pr.Split 11 15
+        , Pr.Jump 13
         , Pr.Match (char 'M')
         , Pr.Match (char 'a')
         , Pr.Match (char 'r')
-        , Pr.Jump 15
+        , Pr.Jump 13
         , Pr.Matched
         ]

@@ -18,7 +18,7 @@ type Inst
     | Match Matcher.Matcher
     | End
     | Jump Int
-    | Split Int Int
+    | Split (List Int)
     | Matched
 
 
@@ -72,8 +72,8 @@ shiftInst n inst =
         Jump a ->
             Jump (a + n)
 
-        Split a b ->
-            Split (a + n) (b + n)
+        Split list ->
+            Split (List.map (\a -> a + n) list)
 
         _ ->
             inst
@@ -132,8 +132,8 @@ finalStep now later prog =
                         Just (Jump a) ->
                             { now = a :: rest, later = later }
 
-                        Just (Split a b) ->
-                            { now = a :: b :: rest, later = later }
+                        Just (Split list) ->
+                            { now = list ++ rest, later = later }
 
                         -- cases not relevant for final step
                         Just Start ->
@@ -170,8 +170,8 @@ step char now later prog =
                         Just (Jump a) ->
                             { now = a :: rest, later = later }
 
-                        Just (Split a b) ->
-                            { now = a :: b :: rest, later = later }
+                        Just (Split list) ->
+                            { now = list ++ rest, later = later }
 
                         -- cases not relevant for final step
                         Just Start ->

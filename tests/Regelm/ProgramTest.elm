@@ -61,20 +61,20 @@ testRegex2 =
     Array.fromList
         [ Match (Matcher.char 'a')
         , Match (Matcher.char 'a')
-        , Split 3 6
+        , Split [ 3, 6 ]
         , Match (Matcher.char 'b')
         , Match (Matcher.char 'b')
 
         --        5
         , Match (Matcher.char 'b')
         , Match (Matcher.char ' ')
-        , Split 8 9
+        , Split [ 8, 9 ]
         , Match (Matcher.range '0' '9')
         , Match (Matcher.char ' ')
 
         --        10
         , Match (Matcher.oneOf [ (Matcher.range 'a' 'z'), (Matcher.range 'A' 'Z') ])
-        , Split 10 12
+        , Split [ 10, 12 ]
         , Matched
         ]
 

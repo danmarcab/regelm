@@ -38,7 +38,7 @@ nodeToProgram node =
                     nodeToProgram node
 
                 optProg =
-                    Program.singleton (Program.Split 1 (Program.length prog + 1))
+                    Program.singleton (Program.Split [ 1, Program.length prog + 1 ])
             in
                 Program.append optProg prog
 
@@ -48,7 +48,7 @@ nodeToProgram node =
                     nodeToProgram node
             in
                 prog
-                    |> Program.add (Program.Split 0 (Program.length prog + 1))
+                    |> Program.add (Program.Split [ 0, Program.length prog + 1 ])
 
         Star node ->
             let
@@ -56,7 +56,7 @@ nodeToProgram node =
                     nodeToProgram node
 
                 optProg =
-                    Program.singleton (Program.Split 1 (Program.length prog + 2))
+                    Program.singleton (Program.Split [ 1, Program.length prog + 2 ])
             in
                 Program.append optProg
                     (prog
@@ -103,21 +103,7 @@ nodeToProgram node =
         Alt nodes ->
             let
                 programs =
-                    nodes
-                        |> List.map
-                            (\node ->
-                                let
-                                    prog =
-                                        nodeToProgram node
-
-                                    optProg =
-                                        Program.singleton (Program.Split 1 (Program.length prog + 2))
-
-                                    firstPart =
-                                        Program.append optProg prog
-                                in
-                                    firstPart
-                            )
+                    List.map nodeToProgram nodes
 
                 jumpTo =
                     programs
@@ -125,7 +111,7 @@ nodeToProgram node =
                         |> List.sum
             in
                 List.foldl
-                    (\prog ( finalProg, shift ) ->
+                    (\prog ( finalProg, shift, splits ) ->
                         let
                             newProg =
                                 prog
@@ -133,11 +119,13 @@ nodeToProgram node =
                                     |> Program.add (Program.Jump jumpTo)
                                     |> Program.appendNoShift finalProg
                         in
-                            ( newProg, shift + (Program.length prog) + 1 )
+                            ( newProg, shift + (Program.length prog) + 1, shift + 1 :: splits )
                     )
-                    ( Program.empty, 0 )
+                    ( Program.empty, 0, [] )
                     programs
-                    |> Tuple.first
+                    |> (\( prog, _, splits ) ->
+                            Program.append (Program.singleton <| Program.Split (List.reverse splits)) prog
+                       )
 
         Group ast ->
             astToProgram ast

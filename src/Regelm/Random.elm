@@ -46,20 +46,21 @@ execInst idx prog seed matchers =
         Just (Jump a) ->
             execInst a prog seed matchers
 
-        Just (Split a b) ->
+        Just (Split list) ->
             let
-                ( val, newSeed ) =
-                    Random.step Random.bool seed
+                ( maybeInst, newSeed ) =
+                    Random.step (Random.sample list) seed
             in
-                execInst
-                    (if val then
-                        a
-                     else
-                        b
-                    )
-                    prog
-                    newSeed
-                    matchers
+                case maybeInst of
+                    Just nextInst ->
+                        execInst
+                            nextInst
+                            prog
+                            newSeed
+                            matchers
+
+                    Nothing ->
+                        matchers
 
         Just Start ->
             execInst (idx + 1) prog seed matchers
