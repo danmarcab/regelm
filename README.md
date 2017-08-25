@@ -2,7 +2,9 @@
 
 Pure elm implementation of regular expressions.
 
-## Quick Start
+See a live example on [https://danmarcab.github.io/regelm/](https://danmarcab.github.io/regelm/)
+
+## Testing if a string matches a Regex
 
 ```elm
 > import Regelm
@@ -19,6 +21,31 @@ Ok False
 Ok True
 ```
 
+## Generating random strings from a Regex
+
+You can generate strings that match a regular expression using `Regelm.Random.pattern`.
+
+```elm
+import Regelm.Random
+
+type Msg 
+    = GenStr
+    | RandomStr String
+
+update msg model =
+    case msg of
+        GenStr ->
+            -- regex is a Regex created using Regex.regex
+            (model, Random.generate (Regelm.Random.pattern regex))
+        RandomStr String ->
+            -- Do something with str
+```
+
+Note that all random types show here are from [`mgold/elm-random-pcg`](`http://package.elm-lang.org/packages/mgold/elm-random-pcg`).
+
+## Using random strings from a Regex in Fuzz tests
+
+You can use `Regelm.Fuzz.pattern` to generate random string for your fuzz tests with `elm-test`.
 
 ## Features
 

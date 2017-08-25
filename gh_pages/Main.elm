@@ -7,94 +7,88 @@ import Regelm exposing (Regex)
 import Regelm.Random
 import Random.Pcg as Random exposing (Seed)
 import Set
+import Element
+import Element.Attributes
+import Style exposing (StyleSheet)
+import Style.Border as Border
+import Color
+import Style.Color as Color
+import Style.Font as Font
 
 
-type alias Model =
-    { inputRegex : String
-    , compiledRegex : Maybe Regex
-    , testString : String
-    , examples : List String
-    , seed : Seed
-    }
+type Styles
+    = NoStyle
+    | Main
+    | Box
 
 
-init : ( Model, Cmd Msg )
-init =
-    ( Model ""
-        Nothing
-        ""
-        []
-        (Random.initialSeed 0)
-    , Random.generate SetSeed <| Random.independentSeed
-    )
+stylesheet : StyleSheet Styles variation
+stylesheet =
+    Style.stylesheet
+        [ Style.style NoStyle []
+        , Style.style Main
+            [ Border.all 1 -- set all border widths to 1 px.
+            , Color.text Color.darkCharcoal
+            , Color.background Color.white
+            , Color.border Color.lightGrey
+            , Font.typeface [ "helvetica", "arial", "sans-serif" ]
+            , Font.size 16
+            , Font.lineHeight 1.3 -- line height, given as a ratio of current font size.
+            ]
+        , Style.style Box
+            [ Color.text Color.white
+            , Color.background Color.blue
+            , Color.border Color.blue
+            , Border.rounded 3 -- round all borders to 3px
 
-
-type Msg
-    = UpdateInput String
-    | UpdateTest String
-    | SetSeed Seed
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
-        UpdateInput str ->
-            let
-                compiled =
-                    Regelm.regex str
-                        |> Result.toMaybe
-
-                examples =
-                    Maybe.map (generateExamples 10 model.seed) compiled
-                        |> Maybe.withDefault []
-            in
-                ( { model
-                    | inputRegex = str
-                    , compiledRegex = compiled
-                    , examples = examples
-                  }
-                , Cmd.none
-                )
-
-        UpdateTest str ->
-            ( { model | testString = str }, Cmd.none )
-
-        SetSeed seed ->
-            ( { model | seed = seed }, Cmd.none )
-
-
-generateExamples : Int -> Seed -> Regex -> List String
-generateExamples n seed regex =
-    generateExamplesWithLimit 1000 n [] seed regex
-        |> List.sort
-
-
-generateExamplesWithLimit : Int -> Int -> List String -> Seed -> Regex -> List String
-generateExamplesWithLimit remainingAttempts n list seed regex =
-    if remainingAttempts == 0 || List.length list == n then
-        list
-    else
-        let
-            ( str, newSeed ) =
-                Random.step (Regelm.Random.pattern regex) seed
-
-            newList =
-                if List.member str list then
-                    list
-                else
-                    str :: list
-        in
-            generateExamplesWithLimit (remainingAttempts - 1) n newList newSeed regex
+            --            , paddingHint 20
+            --            , hover
+            --                [ Color.text Color.white
+            --                , Color.background Color.red
+            --                , Color.border Color.red
+            --                , cursor "pointer"
+            --                ]
+            --            ]
+            ]
+        ]
 
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ input [ onInput UpdateInput, value model.inputRegex ] []
-        , text (Maybe.map (\_ -> "valid") model.compiledRegex |> Maybe.withDefault "invalid")
-        , input [ onInput UpdateTest, value model.testString ] []
-        , examplesView model.examples
+    Element.root stylesheet <|
+        Element.column Main
+            [ Element.Attributes.center, Element.Attributes.width (Element.Attributes.px 800) ]
+            [ header
+            , inputs model
+            , examples model
+            ]
+
+
+header =
+    Element.text "Regelm"
+
+
+inputs model =
+    Element.row Box
+        []
+        [ Element.html (input [ onInput UpdateInput, value model.inputRegex ] [])
+
+        --            , Element.html (text (Maybe.map (\_ -> "valid") model.compiledRegex |> Maybe.withDefault "invalid"))
         ]
+
+
+examples model =
+    Element.el Box [] (Element.html (examplesView model.examples))
+
+
+
+--            div
+--            []
+--            [ input [ onInput UpdateInput, value model.inputRegex ] []
+--            ,
+--            , input [ onInput UpdateTest, value model.testString ] []
+--            , examplesView model.examples
+--            ]
 
 
 examplesView : List String -> Html Msg

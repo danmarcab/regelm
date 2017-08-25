@@ -43,8 +43,7 @@ type alias Regex =
 regex : String -> Result String Regex
 regex str =
     Parser.parse str
-        |> Result.map Compiler.compile
-        |> Result.map Program.Regex
+        |> Result.map (Compiler.compile >> Program.Regex)
 
 
 {-| Match a string with a regular expression
